@@ -14,6 +14,8 @@ app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.gi8q3.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 
+// mongodb+srv://restaurant:ngN3bQh0Xd7Rylal@cluster0.gi8q3.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
+
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 async function run() {
@@ -21,14 +23,21 @@ async function run() {
         await client.connect();
         // console.log('database connected successfully');
         const database = client.db("taskResaturant");
-        const foodItemsCollection =
-            database.collection("foodItems");
+        const foodItemsCollection = database.collection("foodItems");
+        const orderCollection = database.collection("orderLists");
 
         // GET API
         app.get("/FoodItemsLists", async (req, res) => {
             const cursor = foodItemsCollection.find({});
             const foodItemsList = await cursor.toArray();
             res.send(foodItemsList);
+        });
+
+        // POST API
+        app.post("/orderLists", async (req, res) => {
+            const newOrder = req.body;
+            const cursor = await orderCollection.insertOne(newOrder);
+            res.send(cursor);
         });
 
 
